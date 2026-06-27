@@ -18,6 +18,12 @@ WebSocketsServer webSocket(81);
 const char* ssid = WIFI_SSID;
 const char* pass = WIFI_PASS;
 
+void printInfo(const char* key, JsonVariant value) {
+	display.print(key);
+	display.print(": ");
+ 	display.println(value.as<String>());
+}
+
 void onWebSocketEvent(uint8_t clientId, WStype_t type, uint8_t* payload, size_t length) {
 	 if (type == WStype_CONNECTED) {
 		Serial.println("client connected");
@@ -28,10 +34,11 @@ void onWebSocketEvent(uint8_t clientId, WStype_t type, uint8_t* payload, size_t 
 	 	display.setCursor(0, 0);
 	 	display.setTextSize(2);
 		display.clearDisplay();
-	 	display.print("CPU: ");
-	 	display.println(doc["cpu"].as<int>());
-	 	display.print("RAM: ");
-	 	display.println(doc["ram"].as<int>());
+		printInfo("CPU", doc["cpu"]);
+	 	printInfo("RAM", doc["ram"]);
+	 	display.setTextSize(1);
+	 	printInfo("Download", doc["download"]);
+	 	printInfo("Upload", doc["upload"]);
 	 	display.display();
 	 }
 }
