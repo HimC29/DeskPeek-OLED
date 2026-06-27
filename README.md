@@ -1,2 +1,2 @@
-# DeskPeed OLED
+# DeskPeek OLED
 
