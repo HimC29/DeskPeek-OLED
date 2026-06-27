@@ -24,6 +24,18 @@ void printInfo(const char* key, JsonVariant value) {
  	display.println(value.as<String>());
 }
 
+void systemInfo(JsonDocument doc) {
+	display.setCursor(0, 0);
+ 	display.setTextSize(2);
+	display.clearDisplay();
+	printInfo("CPU", doc["cpu"]);
+ 	printInfo("RAM", doc["ram"]);
+ 	display.setTextSize(1);
+ 	printInfo("Download", doc["download"]);
+ 	printInfo("Upload", doc["upload"]);
+	display.display();
+}
+
 void onWebSocketEvent(uint8_t clientId, WStype_t type, uint8_t* payload, size_t length) {
 	 if (type == WStype_CONNECTED) {
 		Serial.println("client connected");
@@ -31,15 +43,7 @@ void onWebSocketEvent(uint8_t clientId, WStype_t type, uint8_t* payload, size_t 
 	 else if (type == WStype_TEXT) {
 	 	JsonDocument doc;
 	 	deserializeJson(doc, payload);
-	 	display.setCursor(0, 0);
-	 	display.setTextSize(2);
-		display.clearDisplay();
-		printInfo("CPU", doc["cpu"]);
-	 	printInfo("RAM", doc["ram"]);
-	 	display.setTextSize(1);
-	 	printInfo("Download", doc["download"]);
-	 	printInfo("Upload", doc["upload"]);
-	 	display.display();
+	 	systemInfo(doc);
 	 }
 }
 
