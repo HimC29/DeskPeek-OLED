@@ -4,6 +4,7 @@
 #include <WiFi.h>
 #include <WebSocketsServer.h>
 #include <ArduinoJson.h>
+#include "secrets.h"
 
 #define SCREEN_WIDTH   128
 #define SCREEN_HEIGHT  64
@@ -14,8 +15,8 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 WebSocketsServer webSocket(81);
 
-const char* ssid = "YOUR SSID";
-const char* pass = "YOUR PASSWORD";
+const char* ssid = WIFI_SSID;
+const char* pass = WIFI_PASS;
 
 void onWebSocketEvent(uint8_t clientId, WStype_t type, uint8_t* payload, size_t length) {
 	 if (type == WStype_CONNECTED) {
