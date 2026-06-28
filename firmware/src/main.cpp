@@ -6,7 +6,7 @@
 #include <ArduinoJson.h>
 #include "secrets.h"
 
-const char* VERSION = "v0.2.0";
+const char* VERSION = "v0.2.1";
 
 #define SCREEN_WIDTH   128
 #define SCREEN_HEIGHT  64
@@ -124,7 +124,8 @@ void onWebSocketEvent(uint8_t clientId, WStype_t type, uint8_t* payload, size_t 
 		webSocket.sendTXT(connectedClient, pageStr);
 	 } else if (type == WStype_TEXT) {
 	 	JsonDocument doc;
-	 	deserializeJson(doc, payload);
+	 	DeserializationError err = deserializeJson(doc, payload);
+	 	if (err) return;
 	 	if (page == SYSTEM_INFO) {
 			systemInfo(doc);
 	 	}

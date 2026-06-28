@@ -80,9 +80,15 @@ python pc/main.py
 Press the rotary encoder button to display the current firmware version on the OLED for 1 second. The PC sender also prints its version to the terminal on startup.
 
 ## Changelog
+> The firmware and PC script versions must match. Always update both together.
+
+### v0.2.1
+- Fixed page switch latency by moving send/receive into separate threads
+- Fixed stale/null data briefly showing on page switch due to stats collection blocking the send loop
+- Stats are now collected continuously in a background thread, independent of page state
+- Fixed potential crash on malformed JSON in firmware WebSocket handler
 
 ### v0.2.0
-> Compatible with firmware v0.1.0
 - IP address prompt on first run, saved to config.json
 - Auto-reconnect when connection to ESP32 is lost
 - Refactored Python sender into proper functions

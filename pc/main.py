@@ -3,9 +3,11 @@ import websocket
 import json
 import psutil
 from datetime import datetime
+import threading
 import os
+import time
 
-VERSION = "v0.2.0"
+VERSION = "v0.2.1"
 
 print(f"DeskPeek OLED {VERSION}")
 
@@ -44,45 +46,79 @@ def connect_to_esp32():
 	ws.settimeout(0.1)
 	return ws
 
+latest_stats = {
+    "cpu": "0%",
+    "ram": "0%",
+    "download": "0.00 KB/s",
+    "upload": "0.00 KB/s"
+}
 
+def get_system_stats():
+	net_before = psutil.net_io_counters()
+	cpu = psutil.cpu_percent(interval=1)
+	net_after = psutil.net_io_counters()
+	download = (net_after.bytes_recv - net_before.bytes_recv) / 1024
+	upload = (net_after.bytes_sent - net_before.bytes_sent) / 1024  
+	ram = psutil.virtual_memory().percent
+	data = {
+		"cpu": f"{cpu}%",
+		"ram": f"{ram}%",
+		"download": f"{download:.2f} KB/s",
+		"upload": f"{upload:.2f} KB/s"
+	}
+	return data
+
+stats_lock = threading.Lock()
+
+def collect_stats():
+    while True:
+        stats = get_system_stats()
+        with stats_lock:
+            latest_stats.update(stats)
+
+page_changed = threading.Event()
+
+def receiver(ws, page_ref):
+    while True:
+        try:
+            msg = ws.recv()
+            page_ref[0] = int(msg)
+            page_changed.set() 
+        except (websocket.WebSocketTimeoutException, ValueError):
+            pass
+
+def sender(ws, page_ref):
+    while True:
+        page_changed.wait(timeout=0.1)
+        page_changed.clear()
+        p = page_ref[0]
+        if p == 0:
+            with stats_lock:
+                data = dict(latest_stats)
+            ws.send(json.dumps(data))
+        elif p == 1:
+            data = {"time": datetime.now().strftime("%H:%M:%S")}
+            ws.send(json.dumps(data))
+            
 def main():
-	page = 0
+	t = threading.Thread(target=collect_stats, daemon=True)
+	t.start()
+
 	try:
-		ws = connect_to_esp32()
-		while True:
-			try:
-				try:
-					msg = ws.recv()
-					page = int(msg)
-				except (websocket.WebSocketTimeoutException, ValueError):
-					pass
+	    ws = connect_to_esp32()
+	    page_ref = [0]
 
-				if page == 0:
-					net_before = psutil.net_io_counters()
-					cpu = psutil.cpu_percent(interval=1)
-					net_after = psutil.net_io_counters()
-					download = (net_after.bytes_recv - net_before.bytes_recv) / 1024
-					upload = (net_after.bytes_sent - net_before.bytes_sent) / 1024  
-					ram = psutil.virtual_memory().percent
-					data = {
-						"cpu": f"{cpu}%",
-						"ram": f"{ram}%",
-						"download": f"{download:.2f} KB/s",
-						"upload": f"{upload:.2f} KB/s"
-					}
-				elif page == 1:
-					now = datetime.now()
-					data = {
-						"time": now.strftime("%H:%M:%S")
-					}
-				ws.send(json.dumps(data))
-			except ConnectionResetError:
-				print("Lost connection to ESP32.")
-				print("Retrying...")
-				ws = connect_to_esp32()
+	    t_recv = threading.Thread(target=receiver, args=(ws, page_ref), daemon=True)
+	    t_send = threading.Thread(target=sender, args=(ws, page_ref), daemon=True)
+	    t_recv.start()
+	    t_send.start()
+
+	    while True:
+	        time.sleep(1)
+
 	except KeyboardInterrupt:
-		ws.close()
-		sys.exit(0);
-
+	    ws.close()
+	    sys.exit(0)
+    
 if __name__ == "__main__":
 	main()
