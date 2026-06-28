@@ -82,6 +82,11 @@ Press the rotary encoder button to display the current firmware version on the O
 ## Changelog
 > The firmware and PC script versions must match. Always update both together.
 
+### v0.2.2
+- Restored auto-reconnect when connection to ESP32 is lost
+- Fixed crash when WebSocket send fails due to dropped connection
+- Fixed runaway reconnect loop caused by stale threads reusing a closed socket
+
 ### v0.2.1
 - Fixed page switch latency by moving send/receive into separate threads
 - Fixed stale/null data briefly showing on page switch due to stats collection blocking the send loop

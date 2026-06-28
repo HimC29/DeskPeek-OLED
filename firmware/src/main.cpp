@@ -6,7 +6,7 @@
 #include <ArduinoJson.h>
 #include "secrets.h"
 
-const char* VERSION = "v0.2.1";
+const char* VERSION = "v0.2.2";
 
 #define SCREEN_WIDTH   128
 #define SCREEN_HEIGHT  64
