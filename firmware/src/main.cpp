@@ -6,6 +6,8 @@
 #include <ArduinoJson.h>
 #include "secrets.h"
 
+const char* VERSION = "v0.1.0";
+
 #define SCREEN_WIDTH   128
 #define SCREEN_HEIGHT  64
 #define OLED_RESET     -1
@@ -42,6 +44,7 @@ uint8_t connectedClient = 0;
 
 const byte CLK_PIN = 32;
 const byte DT_PIN = 33;
+const byte SW_PIN = 25;
 
 static volatile int rotaryDelta = 0;
 static int lastState = 0;
@@ -140,6 +143,7 @@ void setup() {
 	}
 
 	initRotaryInterrupt();
+	pinMode(SW_PIN, INPUT_PULLUP);
 
 	display.clearDisplay();
 
@@ -182,5 +186,12 @@ void loop() {
 		}
 		String pageStr = String((int)page);
 		webSocket.sendTXT(connectedClient, pageStr);
+	}
+	if (digitalRead(SW_PIN) == LOW) {
+		display.clearDisplay();
+		display.setCursor(0, 0);
+		display.println(VERSION);
+		display.display();
+		delay(1000);
 	}
 }

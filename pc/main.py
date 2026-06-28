@@ -4,6 +4,10 @@ import json
 import psutil
 from datetime import datetime
 
+VERSION = "v0.1.0"
+
+print(f"DeskPeek OLED {VERSION}")
+
 ws = websocket.WebSocket()
 ws.connect("ws://192.168.100.119:81")
 ws.settimeout(0.1)

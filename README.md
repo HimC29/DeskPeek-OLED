@@ -32,7 +32,7 @@ A wireless OLED system monitor powered by an ESP32. Your PC sends live stats ove
 | GND     | GND   |
 | CLK     | GPIO 32 |
 | DT      | GPIO 33 |
-| SW      | GPIO 34 |
+| SW      | GPIO 25 |
 
 ## Requirements
 
@@ -78,6 +78,20 @@ Then run:
 ```bash
 python pc/main.py
 ```
+
+## Version
+
+Press the rotary encoder button to display the current firmware version on the OLED for 1 second. The PC sender also prints its version to the terminal on startup.
+
+## Changelog
+
+### v0.1.0
+- Initial release
+- Wi-Fi connection with status display on OLED
+- WebSocket communication between ESP32 and PC
+- System page — live CPU, RAM, download and upload speed
+- Clock page — current time and date
+- Rotary encoder page switching with wrap-around
 
 ## Project Structure
 
