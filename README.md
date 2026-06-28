@@ -67,11 +67,7 @@ The OLED will show the ESP32's IP address once connected to Wi-Fi.
 
 ### 2. PC sender
 
-Edit `pc/main.py` and set the IP address shown on the OLED:
-
-```python
-ws.connect("ws://YOUR_ESP32_IP:81")
-```
+On first run the script will prompt you to enter the ESP32 IP address shown on the OLED. This is saved to `config.json` automatically and reused on subsequent runs. To change the IP, delete `config.json` and restart the script.
 
 Then run:
 
@@ -84,6 +80,12 @@ python pc/main.py
 Press the rotary encoder button to display the current firmware version on the OLED for 1 second. The PC sender also prints its version to the terminal on startup.
 
 ## Changelog
+
+### v0.2.0
+> Compatible with firmware v0.1.0
+- IP address prompt on first run, saved to config.json
+- Auto-reconnect when connection to ESP32 is lost
+- Refactored Python sender into proper functions
 
 ### v0.1.0
 - Initial release
